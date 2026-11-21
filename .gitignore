@@ -22,3 +22,4 @@ id_ed25519*
 logs/
 *.log
 npm-debug.log*
+Push-To-GitHub.bat
