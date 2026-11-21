@@ -1,0 +1,24 @@
+# Dependencies & build output
+node_modules/
+dist/
+
+# Runtime environment & secrets (never commit client keys or local .env)
+.env
+.env.local
+.env.*.local
+
+# Persistent runtime data & SQLite databases
+data/
+server/data/
+*.sqlite
+*.sqlite3
+*.sqlite-shm
+*.sqlite-wal
+*.db
+*.pub
+id_ed25519*
+
+# Logs
+logs/
+*.log
+npm-debug.log*

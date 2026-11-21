@@ -1,0 +1,55 @@
+# ==============================================================================
+# MODE 2 (OPTIONAL): ALL-IN-ONE FULL STACK (BUNDLED HBBS + HBBR + RMM APPLIANCE)
+# Use this if the client does NOT have an existing RustDesk Server yet.
+# Run with: docker compose -f docker-compose.fullstack.yml up -d --build
+# ==============================================================================
+services:
+  hbbs:
+    image: rustdesk/rustdesk-server:latest
+    container_name: rustdesk-site-hbbs
+    command: hbbs
+    ports:
+      - "21115:21115"
+      - "21116:21116"
+      - "21116:21116/udp"
+      - "21118:21118"
+    volumes:
+      - ./data/rustdesk:/root
+    restart: unless-stopped
+
+  hbbr:
+    image: rustdesk/rustdesk-server:latest
+    container_name: rustdesk-site-hbbr
+    command: hbbr
+    ports:
+      - "21117:21117"
+      - "21119:21119"
+    volumes:
+      - ./data/rustdesk:/root
+    restart: unless-stopped
+
+  dashboard:
+    build: .
+    container_name: rustdesk-rmm-appliance
+    depends_on:
+      - hbbs
+      - hbbr
+    ports:
+      - "${DASHBOARD_PORT:-3031}:3031"
+    volumes:
+      - ./data/dashboard:/usr/src/app/server/data
+      - ./data/rustdesk:/usr/src/app/rustdesk-data:ro
+    env_file:
+      - .env
+    environment:
+      - PORT=3031
+      - PUBLIC_DASHBOARD_PORT=${DASHBOARD_PORT:-3031}
+      - SITE_NAME=${SITE_NAME:-RustDesk RMM Appliance}
+      - APPLIANCE_HOST=${APPLIANCE_HOST:-}
+      - RUSTDESK_SERVER=${RUSTDESK_SERVER:-}
+      - RUSTDESK_RELAY_SERVER=${RUSTDESK_RELAY_SERVER:-}
+      - RUSTDESK_KEY=${RUSTDESK_KEY:-}
+      - APPLIANCE_SECONDARY_HOST=${APPLIANCE_SECONDARY_HOST:-}
+      - RUSTDESK_KEY_PATH=/usr/src/app/rustdesk-data/id_ed25519.pub
+      - DB_PATH=/usr/src/app/server/data/database.sqlite
+    restart: unless-stopped
